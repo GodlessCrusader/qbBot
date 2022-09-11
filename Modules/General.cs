@@ -45,5 +45,45 @@ namespace qbBot.Modules
             await player.PlayAsync(track);
             //   Context.Client.Ready += 
         }
+        
+        [Command("musicBox")]
+        [Alias("mb")]
+        public async Task MusicBoxAsync()
+        {
+            if(!ChannelJoinInitCheck())
+            {
+                await ReplyAsync("Error occured");
+                return;
+            }
+            var selectorBuilder = new SelectMenuBuilder();
+            selectorBuilder
+                .WithPlaceholder("Go to:")
+                .AddOption("one","one")
+                .WithCustomId("goto");
+            var componentBuilder = new ComponentBuilder();
+            componentBuilder
+                .WithSelectMenu(selectorBuilder)
+                .WithButton(
+                    label: Emoji.Parse(":track_previous:").ToString(),
+                    customId: "previous-track",
+                    style : ButtonStyle.Success
+                )
+                .WithButton(
+                    label: Emoji.Parse(":play_pause:").ToString(),
+                    customId: "play-pause",
+                    style: ButtonStyle.Success
+                )
+                .WithButton(
+                    label: Emoji.Parse(":track_next:").ToString(),
+                    customId: "next-track",
+                    style: ButtonStyle.Success
+                ).WithButton(
+                    label: Emoji.Parse(":x:").ToString(),
+                    customId: "exit",
+                    style: ButtonStyle.Success
+                );
+            await ReplyAsync("s", components: componentBuilder.Build());
+                
+        }
     }
 }
