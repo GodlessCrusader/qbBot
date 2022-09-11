@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Lavalink4NET;
 using Lavalink4NET.DiscordNet;
 using Lavalink4NET.Player;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,7 +38,7 @@ namespace qbBot.Modules
 
         [Command("rickRoll")]
         [Alias("rr")]
-        public async Task MusicBoxAsync()
+        public async Task RickRollAsync()
         {
             
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
@@ -46,20 +48,28 @@ namespace qbBot.Modules
             //   Context.Client.Ready += 
         }
         
-        [Command("musicBox")]
+        [Command("musicBox", false)]
         [Alias("mb")]
-        public async Task MusicBoxAsync()
+        public async Task MusicBoxAsync(string tracksUrl)
         {
             if(!ChannelJoinInitCheck())
             {
                 await ReplyAsync("Error occured");
                 return;
             }
+        
+            var tracks = await _audioService.GetTracksAsync(tracksUrl, Lavalink4NET.Rest.SearchMode.YouTube);
             var selectorBuilder = new SelectMenuBuilder();
             selectorBuilder
                 .WithPlaceholder("Go to:")
                 .AddOption("one","one")
                 .WithCustomId("goto");
+
+
+            foreach (var track in tracks)
+            {
+                selectorBuilder.AddOption(track.Title, track.TrackIdentifier);
+            }
             var componentBuilder = new ComponentBuilder();
             componentBuilder
                 .WithSelectMenu(selectorBuilder)
@@ -84,6 +94,11 @@ namespace qbBot.Modules
                 );
             await ReplyAsync("s", components: componentBuilder.Build());
                 
+        }
+
+        private bool ChannelJoinInitCheck()
+        {
+            return true;
         }
     }
 }
