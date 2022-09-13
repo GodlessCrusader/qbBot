@@ -47,9 +47,7 @@ namespace qbBot.Services
             var context = new SocketCommandContext(Client, mes);
 
             await _commandService.ExecuteAsync(context, argPos, _provider);
-            //Console.WriteLine($"Message content{arg.Content}");
-            // var words = arg.Content.Split(' ');
-            // commands.Find(x => x.Alias == words[0]).Handle(bot, arg);
+            
         }
 
 

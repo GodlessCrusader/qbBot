@@ -54,6 +54,7 @@ public class Program
             )
             .ConfigureServices((context, services) =>
             {
+                services.AddSingleton<MusicBoxButtonClickHandler>();
                 services.AddHostedService<CommandHandler>();
                 services.AddSingleton<IAudioService, LavalinkNode>();
                 services.AddSingleton(new LavalinkNodeOptions() 
