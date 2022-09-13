@@ -53,6 +53,10 @@ namespace qbBot.Services
                 await player.PauseAsync();
         }
 
+        private async Task RepeatAsync(QueuedLavalinkPlayer player)
+        {
+
+        }
         private async Task NextTrackAsync(QueuedLavalinkPlayer player)
         {
             await player.SkipAsync();

@@ -36,34 +36,51 @@ namespace qbBot.Modules
           
         }
 
+        [Command("roll")]
+        [Alias("r")]
+        public async Task RollDiceAsync(string diceExpr)
+        {
+            Dice.Roller.DefaultConfig.MaxDice = 100;
+            Dice.Roller.DefaultConfig.MaxSides = 1000;
+            try
+            {
+                var result = Dice.Roller.Roll(diceExpr);
+                await ReplyAsync(result.ToString());
+                
+            }
+            catch(Exception e)
+            {
+                await ReplyAsync(e.Message);
+            }
+        }
+
         [Command("rickRoll")]
         [Alias("rr")]
         public async Task RickRollAsync()
         {
+            var check = await ChannelJoinInitCheckAsync();
+            if (!check)
+                return;
             
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             var track = await _audioService.GetTrackAsync("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley", Lavalink4NET.Rest.SearchMode.YouTube);
             _player = await _audioService.JoinAsync<QueuedLavalinkPlayer>(Context.Guild.Id, channel.Id);
             await _player.PlayAsync(track);
-            //   Context.Client.Ready += 
         }
         
         [Command("musicBox", false)]
         [Alias("mb")]
         public async Task MusicBoxAsync(string tracksUrl)
         {
-            if(!ChannelJoinInitCheck())
-            {
-                await ReplyAsync("Error occured");
+            var check = await ChannelJoinInitCheckAsync();
+            if (!check)
                 return;
-            }
-
-            
+           
             var tracks = await _audioService.GetTracksAsync(tracksUrl, Lavalink4NET.Rest.SearchMode.YouTube);
             var selectorBuilder = new SelectMenuBuilder();
             selectorBuilder
                 .WithPlaceholder("Go to:")
-                .AddOption("one","one")
+                .AddOption("Add playlist ->","one")
                 .WithCustomId("goto");
 
             foreach (var track in tracks)
@@ -85,6 +102,11 @@ namespace qbBot.Modules
                     style: ButtonStyle.Success
                 )
                 .WithButton(
+                    label: Emoji.Parse(":repeat:").ToString(),
+                    customId: "repeat",
+                    style: ButtonStyle.Success
+                )
+                .WithButton(
                     label: Emoji.Parse(":track_next:").ToString(),
                     customId: "next-track",
                     style: ButtonStyle.Success
@@ -93,7 +115,7 @@ namespace qbBot.Modules
                     customId: "exit",
                     style: ButtonStyle.Success
                 );
-            
+
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             _player = await _audioService.JoinAsync<QueuedLavalinkPlayer>(Context.Guild.Id, channel.Id);
             Context.Client.ButtonExecuted += HandleMusicBoxComponentAsync;
@@ -110,8 +132,20 @@ namespace qbBot.Modules
             await component.DeferAsync();
         }
 
-        private bool ChannelJoinInitCheck()
+        private async Task<bool> ChannelJoinInitCheckAsync()
         {
+            if (Context.Guild == null)
+            {
+                await ReplyAsync("Please type command in guild chat");
+                return false;
+            }
+
+            if (Context.Guild.VoiceChannels.Where(x => x.ConnectedUsers.Contains(Context.User)) == null)
+            {
+                await ReplyAsync("Please join target channel");
+                return false;
+            }
+
             return true;
         }
     }
