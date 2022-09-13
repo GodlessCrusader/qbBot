@@ -40,8 +40,6 @@ namespace qbBot.Services
                 throw new ArgumentException("Such command doesn't exist");
             }
 
-            
-
             await _onClickMethods.Where(x => x.Name == component.Data.CustomId).Single().ExecuteAsync(player);
         }
 
@@ -59,14 +57,12 @@ namespace qbBot.Services
         }
         private async Task NextTrackAsync(ListedLavalinkPlayer player)
         {
-           
             await player.SkipAsync();
         }
 
         private async Task ExitAsync(ListedLavalinkPlayer player)
         {
             await player.StopAsync(true);
-            await player.DisposeAsync();
         }
 
         private async Task GoToAsync(ListedLavalinkPlayer player)

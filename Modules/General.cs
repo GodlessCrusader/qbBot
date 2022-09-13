@@ -123,7 +123,7 @@ namespace qbBot.Modules
             Context.Client.SelectMenuExecuted += HandleMusicBoxComponentAsync;
             _player.List.AddRange(tracks);
             await _player.SkipAsync();
-            await ReplyAsync("s", components: componentBuilder.Build());
+            await ReplyAsync($"Current track :{_player.CurrentTrack.Title}", components: componentBuilder.Build());
 
         }
 
