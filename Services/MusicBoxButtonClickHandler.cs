@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Lavalink4NET;
 using Lavalink4NET.Player;
+using qbBot.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,6 @@ namespace qbBot.Services
         private IAudioService _audioService { get; set; }
         private IDiscordClientWrapper _wrapper { get; set; }
         
-        private List<LavalinkTrack>? _tracks { get; set; }
         private List<OnClickMethod> _onClickMethods { get; set; }
 
         public MusicBoxButtonClickHandler(IAudioService audioService, IDiscordClientWrapper discordClientWrapper)
@@ -32,7 +32,7 @@ namespace qbBot.Services
             
         }
         
-        public async Task HandleAsync(SocketMessageComponent component, QueuedLavalinkPlayer player)
+        public async Task HandleAsync(SocketMessageComponent component, ListedLavalinkPlayer player)
         {
             
             if(!_onClickMethods.Exists(x => x.Name == component.Data.CustomId))
@@ -40,12 +40,12 @@ namespace qbBot.Services
                 throw new ArgumentException("Such command doesn't exist");
             }
 
-            _tracks = player.Queue.ToList();
+            
 
             await _onClickMethods.Where(x => x.Name == component.Data.CustomId).Single().ExecuteAsync(player);
         }
 
-        private async Task PlayPauseAsync(QueuedLavalinkPlayer player)
+        private async Task PlayPauseAsync(ListedLavalinkPlayer player)
         {
             if (player.State == PlayerState.Paused)
                await player.ResumeAsync();
@@ -53,35 +53,37 @@ namespace qbBot.Services
                 await player.PauseAsync();
         }
 
-        private async Task RepeatAsync(QueuedLavalinkPlayer player)
+        private async Task RepeatAsync(ListedLavalinkPlayer player)
         {
 
         }
-        private async Task NextTrackAsync(QueuedLavalinkPlayer player)
+        private async Task NextTrackAsync(ListedLavalinkPlayer player)
         {
+           
             await player.SkipAsync();
         }
 
-        private async Task ExitAsync(QueuedLavalinkPlayer player)
+        private async Task ExitAsync(ListedLavalinkPlayer player)
         {
             await player.StopAsync(true);
             await player.DisposeAsync();
         }
 
-        private async Task GoToAsync(QueuedLavalinkPlayer player)
+        private async Task GoToAsync(ListedLavalinkPlayer player)
         {
            
         }
-        private async Task PreviousTrackAsync(QueuedLavalinkPlayer player)
+
+        private async Task PreviousTrackAsync(ListedLavalinkPlayer player)
         {
-           // await player.Queue.
+            await player.PreviousAsync();
         }
     }
      
-    internal delegate Task Execute(QueuedLavalinkPlayer player);
+    internal delegate Task Execute(ListedLavalinkPlayer player);
     internal class OnClickMethod
     {
-        public OnClickMethod(string name, Execute execute)
+        internal OnClickMethod(string name, Execute execute)
         {
             Name = name;
             ExecuteAsync = execute;

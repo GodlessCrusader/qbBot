@@ -5,6 +5,7 @@ using Lavalink4NET;
 using Lavalink4NET.DiscordNet;
 using Lavalink4NET.Player;
 using Microsoft.Extensions.DependencyInjection;
+using qbBot.Classes;
 using qbBot.Services;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace qbBot.Modules
         private MusicBoxButtonClickHandler _musicBoxButtonClickHandler { get; set; }
         private IAudioService _audioService { get; set; } 
         private IDiscordClientWrapper _wrapper { get; set; }
-        private QueuedLavalinkPlayer _player;
+        private ListedLavalinkPlayer _player;
         public General(IAudioService audioService, IDiscordClientWrapper discordClientWrapper, MusicBoxButtonClickHandler clickHandler)
         {
             _musicBoxButtonClickHandler = clickHandler;
@@ -64,8 +65,8 @@ namespace qbBot.Modules
             
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             var track = await _audioService.GetTrackAsync("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley", Lavalink4NET.Rest.SearchMode.YouTube);
-            _player = await _audioService.JoinAsync<QueuedLavalinkPlayer>(Context.Guild.Id, channel.Id);
-            await _player.PlayAsync(track);
+            _player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id);
+            await _player.PlayAsync(track, false);
         }
         
         [Command("musicBox", false)]
@@ -117,10 +118,10 @@ namespace qbBot.Modules
                 );
 
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
-            _player = await _audioService.JoinAsync<QueuedLavalinkPlayer>(Context.Guild.Id, channel.Id);
+            _player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id);
             Context.Client.ButtonExecuted += HandleMusicBoxComponentAsync;
             Context.Client.SelectMenuExecuted += HandleMusicBoxComponentAsync;
-            _player.Queue.AddRange(tracks);
+            _player.List.AddRange(tracks);
             await _player.SkipAsync();
             await ReplyAsync("s", components: componentBuilder.Build());
 
