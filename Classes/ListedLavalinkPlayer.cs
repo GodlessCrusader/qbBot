@@ -76,53 +76,7 @@ namespace qbBot.Classes
         }
 
         
-        /*public virtual async Task PlayTopAsync(LavalinkTrack track)
-        {
-            EnsureNotDestroyed();
-
-            if (track is null)
-            {
-                throw new ArgumentNullException(nameof(track));
-            }
-
-            // play track if none is playing
-            if (State == PlayerState.NotPlaying)
-            {
-                await PlayAsync(track, enqueue: false);
-            }
-            // the player is currently playing a track, enqueue the track at top
-            else
-            {
-                Queue.Insert(0, track);
-            }
-        }*/
-
-        
-        /*public virtual async Task<bool> PushTrackAsync(LavalinkTrack track, bool push = false)
-        {
-            // star track immediately
-            if (State == PlayerState.NotPlaying)
-            {
-                if (push)
-                {
-                    return false;
-                }
-
-                await PlayAsync(track, enqueue: false);
-                return false;
-            }
-
-            // create clone and set starting position
-            var oldTrack = CurrentTrack!.WithPosition(Position.Position);
-
-            // enqueue old track with starting position
-            Queue.Add(oldTrack);
-
-            // push track
-            await PlayAsync(track, enqueue: false);
-            return true;
-        }*/
-
+       
         public virtual Task PreviousAsync(int count = 1)
         {
             if (count <= 0)
@@ -140,33 +94,21 @@ namespace qbBot.Classes
 
             else if (!(List.Count == 0))
             {
-                LavalinkTrack? track = null;
+                
 
                 for(int i = 0; i < count; i++) 
                 {
-                    // no more tracks in queue
-                    if (List.Count < 1)
-                    {
-                        // no tracks found
-                        return DisconnectAsync();
-                    }
-
                     // requeue track
-                    track = List[ List.Count - 1 ];
+                    List.Insert(0, List[List.Count - 1]);
                     List.RemoveAt( List.Count - 1 );
-                    List.Insert(0, track);
-                    track = List[ List.Count - 1 ];
+                    
                 }
 
                 // a track to play was found, dequeue and play
-                return PlayAsync(track!, false);
+                return PlayAsync(List[List.Count - 1], false);
             }
             // no tracks queued, stop player and disconnect if specified
-            else
-            {
-                StopAsync(disconnect: _disconnectOnStop);
-            }
-
+           
             return Task.CompletedTask;
         }
     
@@ -193,14 +135,6 @@ namespace qbBot.Classes
 
                 for(int i = 0; i < count; i++)
                 {
-                    // no more tracks in queue
-                    if (List.Count < 1)
-                    {
-                        // no tracks found
-                        return DisconnectAsync();
-                    }
-
-                    // requeue track
                     track = List[0];
                     List.RemoveAt(0);
                     List.Add(track);
@@ -208,11 +142,6 @@ namespace qbBot.Classes
 
                 // a track to play was found, dequeue and play
                 return PlayAsync(track!, false);
-            }
-            // no tracks queued, stop player and disconnect if specified
-            else
-            {
-                StopAsync(disconnect: _disconnectOnStop);
             }
 
             return Task.CompletedTask;

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,12 +22,12 @@ namespace qbBot.Modules
         private MusicBoxButtonClickHandler _musicBoxButtonClickHandler { get; set; }
         private IAudioService _audioService { get; set; } 
         private IDiscordClientWrapper _wrapper { get; set; }
-        private ListedLavalinkPlayer _player;
         public General(IAudioService audioService, IDiscordClientWrapper discordClientWrapper, MusicBoxButtonClickHandler clickHandler)
         {
             _musicBoxButtonClickHandler = clickHandler;
             _wrapper = discordClientWrapper;
             _audioService = audioService;
+
             
         }
         
@@ -65,8 +66,11 @@ namespace qbBot.Modules
             
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             var track = await _audioService.GetTrackAsync("https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley", Lavalink4NET.Rest.SearchMode.YouTube);
-            _player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id);
-            await _player.PlayAsync(track, false);
+
+            var player = _audioService.GetPlayer(Context.Guild.Id);
+            if(player == null)
+                await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id);
+            await player.PlayAsync(track);
         }
         
         [Command("musicBox", false)]
@@ -118,21 +122,23 @@ namespace qbBot.Modules
                 );
 
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
-            _player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id);
-            Context.Client.ButtonExecuted += HandleMusicBoxComponentAsync;
-            Context.Client.SelectMenuExecuted += HandleMusicBoxComponentAsync;
-            _player.List.AddRange(tracks);
-            await _player.SkipAsync();
-            await ReplyAsync($"Current track :{_player.CurrentTrack.Title}", components: componentBuilder.Build());
+            
+            var player = _audioService.GetPlayer<ListedLavalinkPlayer>(Context.Guild.Id);
 
+            
+            if (player == null)
+            {
+                player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id, true);
+            }
+           
+            //_player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id, true);
+
+            player.List.AddRange(tracks);
+            await player.SkipAsync();
+            var playerMessage = await ReplyAsync($"Current track :{player.CurrentTrack.Title}", components: componentBuilder.Build());
         }
 
-        private async Task HandleMusicBoxComponentAsync(SocketMessageComponent component)
-        {
-            await _musicBoxButtonClickHandler.HandleAsync(component, _player);
-            await component.DeferAsync();
-        }
-
+       
         private async Task<bool> ChannelJoinInitCheckAsync()
         {
             if (Context.Guild == null)
@@ -141,7 +147,9 @@ namespace qbBot.Modules
                 return false;
             }
 
-            if (Context.Guild.VoiceChannels.Where(x => x.ConnectedUsers.Contains(Context.User)) == null)
+            //)
+
+            if (Context.Guild.VoiceChannels.Any(x => x.ConnectedUsers.Contains(Context.User)) == false)
             {
                 await ReplyAsync("Please join target channel");
                 return false;

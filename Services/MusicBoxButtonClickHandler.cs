@@ -27,23 +27,37 @@ namespace qbBot.Services
                 new OnClickMethod("next-track", NextTrackAsync),
                 new OnClickMethod("previous-track", PreviousTrackAsync),
                 new OnClickMethod("exit", ExitAsync),
-                new OnClickMethod("goto", GoToAsync)
+                new OnClickMethod("goto", GoToAsync),
+                new OnClickMethod("repeat", RepeatAsync)
             };
-            
         }
         
-        public async Task HandleAsync(SocketMessageComponent component, ListedLavalinkPlayer player)
+        public async Task HandleMusicBoxComponentAsync(SocketMessageComponent component)
         {
             
-            if(!_onClickMethods.Exists(x => x.Name == component.Data.CustomId))
+            if (!_onClickMethods.Exists(x => x.Name == component.Data.CustomId))
             {
-                throw new ArgumentException("Such command doesn't exist");
+                return;
             }
 
-            await _onClickMethods.Where(x => x.Name == component.Data.CustomId).Single().ExecuteAsync(player);
+            var player = _audioService.GetPlayer<ListedLavalinkPlayer>((ulong)component.GuildId);
+
+            if (player == null)
+                return;
+
+            await _onClickMethods.Where(x => x.Name == component.Data.CustomId).Single().ExecuteAsync(player, component);
+            
+            if (player.State == PlayerState.Destroyed)
+            {
+                player.Dispose();
+            }
+            
+            await component.DeferAsync();
+
+            
         }
 
-        private async Task PlayPauseAsync(ListedLavalinkPlayer player)
+        private async Task PlayPauseAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             if (player.State == PlayerState.Paused)
                await player.ResumeAsync();
@@ -51,32 +65,44 @@ namespace qbBot.Services
                 await player.PauseAsync();
         }
 
-        private async Task RepeatAsync(ListedLavalinkPlayer player)
+        private async Task RepeatAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
-
+            if(!player.IsLooping)
+                player.IsLooping = true;
+            else
+                player.IsLooping = false;
         }
-        private async Task NextTrackAsync(ListedLavalinkPlayer player)
+
+        private async Task NextTrackAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             await player.SkipAsync();
         }
 
-        private async Task ExitAsync(ListedLavalinkPlayer player)
+        private async Task ExitAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             await player.StopAsync(true);
+            await player.DestroyAsync();
         }
 
-        private async Task GoToAsync(ListedLavalinkPlayer player)
+        private async Task GoToAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
-           
+            for(int i = 0; i < player.List.Count; i++)
+            {
+                if (component.Data.Values.Contains(player.List[i].TrackIdentifier))
+                {
+                    await player.SkipAsync(i + 1);
+                    break;
+                }
+            }
         }
 
-        private async Task PreviousTrackAsync(ListedLavalinkPlayer player)
+        private async Task PreviousTrackAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             await player.PreviousAsync();
         }
     }
      
-    internal delegate Task Execute(ListedLavalinkPlayer player);
+    internal delegate Task Execute(ListedLavalinkPlayer player, SocketMessageComponent component);
     internal class OnClickMethod
     {
         internal OnClickMethod(string name, Execute execute)
