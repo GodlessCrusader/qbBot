@@ -80,8 +80,7 @@ namespace qbBot.Services
 
         private async Task ExitAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
-            await player.StopAsync(true);
-            await player.DestroyAsync();
+            await player.ExitAsync();
         }
 
         private async Task GoToAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
@@ -90,7 +89,7 @@ namespace qbBot.Services
             {
                 if (component.Data.Values.Contains(player.List[i].TrackIdentifier))
                 {
-                    await player.SkipAsync(i + 1);
+                    await player.GotoAsync(i + 1);
                     break;
                 }
             }

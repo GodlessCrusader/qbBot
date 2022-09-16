@@ -1,4 +1,5 @@
-﻿using Lavalink4NET.Events;
+﻿using Discord;
+using Lavalink4NET.Events;
 using Lavalink4NET.Player;
 using System;
 using System.Collections.Generic;
@@ -12,22 +13,22 @@ namespace qbBot.Classes
     {
         private readonly bool _disconnectOnStop;
 
-        
         public ListedLavalinkPlayer()
         {
             List = new List<LavalinkTrack>();
-
-           
             _disconnectOnStop = DisconnectOnStop;
             DisconnectOnStop = false;
+            MessageModificationRequired = (o, i) => { return; };
         }
 
-
-        public int CurrentTrackIndex { get; private set; }
+        public IUserMessage? Message { get; set; }
+        
+        public event EventHandler<int> MessageModificationRequired;
+        
         public bool IsLooping { get; set; }
 
+        private int _currentTrackIndex = -1;
         public List<LavalinkTrack> List { get; }
-
 
         public override Task OnTrackEndAsync(TrackEndEventArgs eventArgs)
         {
@@ -75,8 +76,23 @@ namespace qbBot.Classes
             return 0;
         }
 
-        
-       
+        public virtual Task GotoAsync(int index)
+        {
+            if (index - 1 < 0 || index - 1 > List.Count - 1 || List.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            EnsureNotDestroyed();
+            EnsureConnected();
+           
+            _currentTrackIndex = index - 1;
+            
+            MessageModificationRequired.Invoke(this, _currentTrackIndex);
+
+            return PlayAsync(List[_currentTrackIndex], false);
+        }
+
         public virtual Task PreviousAsync(int count = 1)
         {
             if (count <= 0)
@@ -99,13 +115,14 @@ namespace qbBot.Classes
                 for(int i = 0; i < count; i++) 
                 {
                     // requeue track
-                    List.Insert(0, List[List.Count - 1]);
-                    List.RemoveAt( List.Count - 1 );
-                    
+                    _currentTrackIndex --;
+                    if(_currentTrackIndex < 0)
+                        _currentTrackIndex = List.Count - 1;
                 }
 
+                MessageModificationRequired.Invoke(this, _currentTrackIndex);
                 // a track to play was found, dequeue and play
-                return PlayAsync(List[List.Count - 1], false);
+                return PlayAsync(List[_currentTrackIndex], false);
             }
             // no tracks queued, stop player and disconnect if specified
            
@@ -131,17 +148,18 @@ namespace qbBot.Classes
             
             else if (! (List.Count == 0))
             {
-                LavalinkTrack? track = null;
 
-                for(int i = 0; i < count; i++)
+                
+                for (int i = 0; i < count; i++)
                 {
-                    track = List[0];
-                    List.RemoveAt(0);
-                    List.Add(track);
+                    _currentTrackIndex ++;
+                    if(_currentTrackIndex > List.Count - 1)
+                        _currentTrackIndex = 0;
                 }
 
+                MessageModificationRequired.Invoke(this, _currentTrackIndex);
                 // a track to play was found, dequeue and play
-                return PlayAsync(track!, false);
+                return PlayAsync(List[_currentTrackIndex], false);
             }
 
             return Task.CompletedTask;
@@ -151,6 +169,13 @@ namespace qbBot.Classes
         {
             List.Clear();
             return base.StopAsync(disconnect);
+        }
+
+        public async Task ExitAsync()
+        {
+            await StopAsync(true);
+            await DestroyAsync();
+            MessageModificationRequired.Invoke(this, _currentTrackIndex);
         }
     }
 }

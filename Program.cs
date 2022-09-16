@@ -56,6 +56,7 @@ public class Program
             )
             .ConfigureServices((context, services) =>
             {
+                services.AddSingleton<InterfaceMessageChangeHandler>();
                 services.AddSingleton<MusicBoxButtonClickHandler>();
                 services.AddHostedService<CommandHandler>();
                 services.AddSingleton<IAudioService, LavalinkNode>();
@@ -68,9 +69,7 @@ public class Program
                 services.AddSingleton<IDiscordClientWrapper, DiscordClientWrapper>();
                 services.AddSingleton<InactivityTrackingOptions>();
                 services.AddSingleton<InactivityTrackingService>();
-                //services.AddSingleton<PlayerFactory<LavalinkPlayer>>();
-                
-
+                                
             })
             .UseConsoleLifetime();
 
@@ -89,12 +88,12 @@ public class Program
             var musicBoxComponentHandler = host.Services.GetRequiredService<MusicBoxButtonClickHandler>();
             var client = host.Services.GetRequiredService<DiscordSocketClient>();
             var audioService = host.Services.GetRequiredService<IAudioService>();
-            client.Ready += () => audioService.InitializeAsync();
+            client.Ready += audioService.InitializeAsync;
             client.ButtonExecuted += musicBoxComponentHandler.HandleMusicBoxComponentAsync;
             client.SelectMenuExecuted += musicBoxComponentHandler.HandleMusicBoxComponentAsync;
             await host.RunAsync();
         }
-        Console.ReadLine();
+      
     }
 }
 
