@@ -85,13 +85,14 @@ namespace qbBot.Services
 
         private async Task GoToAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
-            for(int i = 0; i < player.List.Count; i++)
+            int index;
+            if(!int.TryParse(component.Data.Value,  out index) || index > player.List.Count)
             {
-                if (component.Data.Values.Contains(player.List[i].TrackIdentifier))
-                {
-                    await player.GotoAsync(i + 1);
-                    break;
-                }
+                return;
+            }
+            else
+            {
+                await player.GotoAsync(index);
             }
         }
 

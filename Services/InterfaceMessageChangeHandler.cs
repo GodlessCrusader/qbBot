@@ -76,14 +76,14 @@ namespace qbBot.Services
                     for (int i = 0; i < 25; i++)
                     {
                         selectorBuilder.AddOption($"{counter++}. {player.List[currentTrackIndex + i].Title}",
-                            player.List[currentTrackIndex + i].TrackIdentifier);
+                            (currentTrackIndex + i).ToString());
 
                     }
                 else
                     for(int i = currentTrackIndex; i < player.List.Count; i++)
                     {
                         selectorBuilder.AddOption($"{counter++}. {player.List[i].Title}",
-                            player.List[i].TrackIdentifier);
+                            i.ToString());
                     }
                 componentBuilder.WithSelectMenu(selectorBuilder);
 

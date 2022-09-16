@@ -21,15 +21,12 @@ namespace qbBot.Modules
     public class General : ModuleBase<SocketCommandContext>
     {
         private InterfaceMessageChangeHandler _interfaceMessageChangeHandler { get; set; }
-        private MusicBoxButtonClickHandler _musicBoxButtonClickHandler { get; set; }
         private IAudioService _audioService { get; set; } 
         private IDiscordClientWrapper _wrapper { get; set; }
         public General(IAudioService audioService,
             IDiscordClientWrapper discordClientWrapper,
-            MusicBoxButtonClickHandler clickHandler,
             InterfaceMessageChangeHandler interfaceMessageChangeHandler)
         {
-            _musicBoxButtonClickHandler = clickHandler;
             _wrapper = discordClientWrapper;
             _audioService = audioService;
             _interfaceMessageChangeHandler = interfaceMessageChangeHandler;
@@ -97,8 +94,13 @@ namespace qbBot.Modules
             if (!check)
                 return;
            
-            var tracks = await _audioService.GetTracksAsync(tracksUrl, Lavalink4NET.Rest.SearchMode.YouTube);
+            var tracks = await _audioService.GetTracksAsync(tracksUrl);
 
+            if(tracks == null)
+            {
+                await ReplyAsync("Couldn't find anything");
+                return;
+            }
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             
             var player = _audioService.GetPlayer<ListedLavalinkPlayer>(Context.Guild.Id);
