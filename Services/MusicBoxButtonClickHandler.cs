@@ -86,7 +86,7 @@ namespace qbBot.Services
         private async Task GoToAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             int index;
-            if(!int.TryParse(component.Data.Value,  out index) || index > player.List.Count)
+            if (!int.TryParse(component.Data.Values.First(),  out index) || index > player.List.Count)
             {
                 return;
             }

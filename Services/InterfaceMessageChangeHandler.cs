@@ -12,6 +12,7 @@ namespace qbBot.Services
 {
     public class InterfaceMessageChangeHandler
     {
+        const int MAX_OPTIONS_COUNT = 25;
         private IAudioService _audioService { get; set; }
         private IDiscordClientWrapper _wrapper { get; set; }
         public InterfaceMessageChangeHandler(IAudioService audioService, IDiscordClientWrapper wrapper)
@@ -24,7 +25,7 @@ namespace qbBot.Services
         {
             if (sender is ListedLavalinkPlayer)
             {
-                var player = (ListedLavalinkPlayer)sender;
+                var player = sender as ListedLavalinkPlayer;
 
                 if(player.State == Lavalink4NET.Player.PlayerState.Destroyed)
                 {
@@ -71,20 +72,30 @@ namespace qbBot.Services
                     selectorBuilder
                         .WithPlaceholder("Go to:")
                         .WithCustomId("goto");
-                    var counter = currentTrackIndex + 1;
-                if(player.List.Count - currentTrackIndex - 1 >= 25)
-                    for (int i = 0; i < 25; i++)
-                    {
-                        selectorBuilder.AddOption($"{counter++}. {player.List[currentTrackIndex + i].Title}",
-                            (currentTrackIndex + i).ToString());
 
-                    }
-                else
-                    for(int i = currentTrackIndex; i < player.List.Count; i++)
+                int counter = 1;
+                int iterationEnd = MAX_OPTIONS_COUNT;
+                int iterationStart = 0;
+                if (player.List.Count >= MAX_OPTIONS_COUNT)
+                {
+                    if (currentTrackIndex >= MAX_OPTIONS_COUNT / 2)
                     {
-                        selectorBuilder.AddOption($"{counter++}. {player.List[i].Title}",
-                            i.ToString());
+                        counter = 1 + currentTrackIndex - MAX_OPTIONS_COUNT / 2;
+                        iterationStart = counter - 1;
+                        iterationEnd = iterationStart + MAX_OPTIONS_COUNT;
                     }
+                }
+                else
+                    iterationEnd = player.List.Count;
+                
+                for (int i = iterationStart; i < iterationEnd; i++)
+                {
+                    selectorBuilder.AddOption(
+                        $"{counter++}. {player.List[i].Title}",
+                        (i + 1).ToString());
+                }
+
+
                 componentBuilder.WithSelectMenu(selectorBuilder);
 
 
