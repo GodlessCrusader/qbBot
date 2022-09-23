@@ -1,4 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.Interactions;
+using Discord.WebSocket;
 using Lavalink4NET;
 using Lavalink4NET.Player;
 using qbBot.Classes;
@@ -19,6 +21,7 @@ namespace qbBot.Services
 
         public MusicBoxButtonClickHandler(IAudioService audioService, IDiscordClientWrapper discordClientWrapper)
         {
+           
             _wrapper = discordClientWrapper;
             _audioService = audioService;
             _onClickMethods = new List<OnClickMethod>() 
@@ -28,7 +31,8 @@ namespace qbBot.Services
                 new OnClickMethod("previous-track", PreviousTrackAsync),
                 new OnClickMethod("exit", ExitAsync),
                 new OnClickMethod("goto", GoToAsync),
-                new OnClickMethod("repeat", RepeatAsync)
+                new OnClickMethod("repeat", RepeatAsync),
+                new OnClickMethod("playlist", SelectPlaylistAsync)
             };
         }
         
@@ -52,17 +56,40 @@ namespace qbBot.Services
                 player.Dispose();
             }
             
-            await component.DeferAsync();
+            await component.DeferAsync(); 
+        }
 
+        public async Task HandleAddPlaylistModal(SocketModal socketModal)
+        {
+            var title = socketModal.Data.Components.First(x => x.CustomId == "playlist-name").Value;
+            var url = socketModal.Data.Components.First(x => x.CustomId == "playlist-url").Value;
+            if (socketModal.GuildId == null)
+                return;
+            var player = _audioService.GetPlayer<ListedLavalinkPlayer>((ulong)socketModal.GuildId);
+            player.AddPlaylist(title, url);
             
+            await socketModal.DeferAsync();
         }
-        private async Task SelectPlaylist(ListedLavalinkPlayer player, SocketMessageComponent component)
+        private async Task SelectPlaylistAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
+            if (component.Data.Values.First() == "add-playlist")
+            {
+                await AddPlaylistAsync(player, component);
+                return;
+            }
 
+            await player.ChangePlaylistAsync(component.Data.Values.First(), _audioService);
         }
-        private async Task AddPlaylist(ListedLavalinkPlayer player, SocketMessageComponent component)
+        private async Task AddPlaylistAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
-
+            var formBuilder = new ModalBuilder();
+            formBuilder
+                .AddTextInput("Playlist name:", "playlist-name")
+                .AddTextInput("Playlist url:", "playlist-url")
+                .WithTitle("Add playlist")
+                .WithCustomId("add-playlist-modal");
+            await component.RespondWithModalAsync(formBuilder.Build());
+            
         }
         private async Task PlayPauseAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {

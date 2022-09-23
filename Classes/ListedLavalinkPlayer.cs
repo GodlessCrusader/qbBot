@@ -5,6 +5,7 @@ using Lavalink4NET.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace qbBot.Classes
 
         public ListedLavalinkPlayer()
         {
-            Playlists = new();
+            Playlist = new();
             List = new();
             _disconnectOnStop = DisconnectOnStop;
             DisconnectOnStop = false;
@@ -32,7 +33,7 @@ namespace qbBot.Classes
 
         private int _currentTrackIndex = -1;
         public List<LavalinkTrack> List { get; }
-
+        public Dictionary<string, string> Playlist { get; }
         public override Task OnTrackEndAsync(TrackEndEventArgs eventArgs)
         {
             
@@ -182,20 +183,26 @@ namespace qbBot.Classes
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
         }
 
-        public async Task ChangePlaylist(int index, IAudioService service)
+        public Task AddPlaylist(string title, string url)
         {
-            if(index < 0 || index >= Playlists.Count)
+            Playlist.Add(title, url);
+            MessageModificationRequired.Invoke(this, _currentTrackIndex);
+            return Task.CompletedTask;
+        }
+        public async Task ChangePlaylistAsync(string key, IAudioService service)
+        {
+            if(!Playlist.ContainsKey(key))
                 return;
             
-            var tracks = await service.GetTracksAsync(Playlists[index]);
+            var tracks = await service.GetTracksAsync(Playlist[key]);
             if (tracks == null)
                 return;
 
             List.Clear();
             List.AddRange(tracks);
-            _currentTrackIndex = -1;
+            _currentTrackIndex = 0;
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
-            SkipAsync();
+            await GotoAsync(_currentTrackIndex + 1);
             
         }
     }

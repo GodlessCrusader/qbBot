@@ -10,8 +10,7 @@
   <ItemGroup>
     <PackageReference Include="DiceRoller" Version="4.2.0" />
     <PackageReference Include="Discord.Addons.Hosting" Version="5.1.0" />
-    <PackageReference Include="Discord.Net" Version="3.8.0" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2756" />
+    <PackageReference Include="Discord.Net" Version="3.8.1" />
     <PackageReference Include="Lavalink4NET" Version="2.1.1" />
     <PackageReference Include="Lavalink4NET.Discord.NET" Version="2.1.1" />
   </ItemGroup>

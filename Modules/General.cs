@@ -116,13 +116,13 @@ namespace qbBot.Modules
                 player.MessageModificationRequired += _interfaceMessageChangeHandler.ModifyInterfaceMessageAsync;
             }
 
-            player.Playlist.Add(playListName, tracksUrl);
             player.List.AddRange(tracks);
             
             var playerMessage = await ReplyAsync($"MusicBox Player");
             if(player.Message == null)
                 player.Message = playerMessage;
-            await player.SkipAsync();
+            player.AddPlaylist(playListName, tracksUrl);
+            await player.GotoAsync(1);
         }
 
         

@@ -1,6 +1,5 @@
 ﻿using Discord.Addons.Hosting;
 using Discord.WebSocket;
-using DiscordBot.Commands;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -91,6 +90,7 @@ public class Program
             client.Ready += audioService.InitializeAsync;
             client.ButtonExecuted += musicBoxComponentHandler.HandleMusicBoxComponentAsync;
             client.SelectMenuExecuted += musicBoxComponentHandler.HandleMusicBoxComponentAsync;
+            client.ModalSubmitted += musicBoxComponentHandler.HandleAddPlaylistModal;
             await host.RunAsync();
         }
       

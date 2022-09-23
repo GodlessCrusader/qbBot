@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Lavalink4NET;
 using qbBot.Classes;
 using System;
@@ -13,9 +14,10 @@ namespace qbBot.Services
     public class InterfaceMessageChangeHandler
     {
         const int MAX_OPTIONS_COUNT = 25;
+       
         private IAudioService _audioService { get; set; }
         private IDiscordClientWrapper _wrapper { get; set; }
-        public InterfaceMessageChangeHandler(IAudioService audioService, IDiscordClientWrapper wrapper)
+        public InterfaceMessageChangeHandler( IAudioService audioService, IDiscordClientWrapper wrapper)
         {
             _audioService = audioService;
             _wrapper = wrapper;
@@ -79,10 +81,12 @@ namespace qbBot.Services
                     .WithPlaceholder("Playlist:")
                     .WithCustomId("playlist")
                     .AddOption("Add playlist ->", "add-playlist");
-                for(int i = 0; i < player.Playlist.Count; i++)
+                
+                foreach(var playlist in player.Playlist)
                 {
-                    playlistsSelectorBuilder.AddOption("", $"{i}");
+                    playlistsSelectorBuilder.AddOption(playlist.Key, playlist.Key);
                 }
+
                 int counter = 1;
                 int iterationEnd = MAX_OPTIONS_COUNT;
                 int iterationStart = 0;
@@ -106,6 +110,7 @@ namespace qbBot.Services
                 }
 
 
+                componentBuilder.WithSelectMenu(playlistsSelectorBuilder);
                 componentBuilder.WithSelectMenu(tracksSelectorBuilder);
 
 
