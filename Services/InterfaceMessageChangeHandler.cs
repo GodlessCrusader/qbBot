@@ -79,7 +79,7 @@ namespace qbBot.Services
                     .WithPlaceholder("Playlist:")
                     .WithCustomId("playlist")
                     .AddOption("Add playlist ->", "add-playlist");
-                for(int i = 0; i < player.Playlists.Count; i++)
+                for(int i = 0; i < player.Playlist.Count; i++)
                 {
                     playlistsSelectorBuilder.AddOption("", $"{i}");
                 }
