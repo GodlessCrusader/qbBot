@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Lavalink4NET;
 using Lavalink4NET.Events;
 using Lavalink4NET.Player;
 using System;
@@ -13,9 +14,11 @@ namespace qbBot.Classes
     {
         private readonly bool _disconnectOnStop;
 
+
         public ListedLavalinkPlayer()
         {
-            List = new List<LavalinkTrack>();
+            Playlists = new();
+            List = new();
             _disconnectOnStop = DisconnectOnStop;
             DisconnectOnStop = false;
             MessageModificationRequired = (o, i) => { return; };
@@ -30,7 +33,6 @@ namespace qbBot.Classes
         private int _currentTrackIndex = -1;
         public List<LavalinkTrack> List { get; }
 
-        public Dictionary<string, string> Playlist {get;}
         public override Task OnTrackEndAsync(TrackEndEventArgs eventArgs)
         {
             
@@ -178,6 +180,23 @@ namespace qbBot.Classes
             await StopAsync(true);
             await DestroyAsync();
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
+        }
+
+        public async Task ChangePlaylist(int index, IAudioService service)
+        {
+            if(index < 0 || index >= Playlists.Count)
+                return;
+            
+            var tracks = await service.GetTracksAsync(Playlists[index]);
+            if (tracks == null)
+                return;
+
+            List.Clear();
+            List.AddRange(tracks);
+            _currentTrackIndex = -1;
+            MessageModificationRequired.Invoke(this, _currentTrackIndex);
+            SkipAsync();
+            
         }
     }
 }

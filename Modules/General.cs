@@ -144,8 +144,6 @@ namespace qbBot.Modules
                 return false;
             }
 
-         
-
             if (Context.Guild.VoiceChannels.Any(x => x.ConnectedUsers.Contains(Context.User)) == false)
             {
                 await ReplyAsync("Please join target channel");
@@ -154,5 +152,7 @@ namespace qbBot.Modules
 
             return true;
         }
+
+
     }
 }

@@ -21,6 +21,7 @@ namespace qbBot.Services
             _wrapper = wrapper;
         }
 
+
         public async void ModifyInterfaceMessageAsync(object sender, int currentTrackIndex)
         {
             if (sender is ListedLavalinkPlayer)
@@ -68,11 +69,20 @@ namespace qbBot.Services
                     .AddField($"Currently playing: {currentTrackIndex + 1}. {player.List[currentTrackIndex].Title}",
                     player.List[currentTrackIndex].Duration);
                     
-                var selectorBuilder = new SelectMenuBuilder();
-                    selectorBuilder
+                var tracksSelectorBuilder = new SelectMenuBuilder();
+                    tracksSelectorBuilder
                         .WithPlaceholder("Go to:")
                         .WithCustomId("goto");
 
+                var playlistsSelectorBuilder = new SelectMenuBuilder();
+                playlistsSelectorBuilder
+                    .WithPlaceholder("Playlist:")
+                    .WithCustomId("playlist")
+                    .AddOption("Add playlist ->", "add-playlist");
+                for(int i = 0; i < player.Playlists.Count; i++)
+                {
+                    playlistsSelectorBuilder.AddOption("", $"{i}");
+                }
                 int counter = 1;
                 int iterationEnd = MAX_OPTIONS_COUNT;
                 int iterationStart = 0;
@@ -90,13 +100,13 @@ namespace qbBot.Services
                 
                 for (int i = iterationStart; i < iterationEnd; i++)
                 {
-                    selectorBuilder.AddOption(
+                    tracksSelectorBuilder.AddOption(
                         $"{counter++}. {player.List[i].Title}",
                         (i + 1).ToString());
                 }
 
 
-                componentBuilder.WithSelectMenu(selectorBuilder);
+                componentBuilder.WithSelectMenu(tracksSelectorBuilder);
 
 
                 await player.Message.ModifyAsync(x => { 
