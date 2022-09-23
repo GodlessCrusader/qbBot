@@ -96,6 +96,11 @@ namespace qbBot.Modules
            
             var tracks = await _audioService.GetTracksAsync(tracksUrl);
 
+            var playListName = "Playlist";
+            
+            if (Context.Message.Embeds != null)
+                playListName = Context.Message.Embeds.First().Title;
+                
             if(tracks == null)
             {
                 await ReplyAsync("Couldn't find anything");
@@ -104,13 +109,14 @@ namespace qbBot.Modules
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             
             var player = _audioService.GetPlayer<ListedLavalinkPlayer>(Context.Guild.Id);
-
+            
             if (player == null)
             {
                 player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id, true);
                 player.MessageModificationRequired += _interfaceMessageChangeHandler.ModifyInterfaceMessageAsync;
             }
-           
+
+            player.Playlist.Add(playListName, tracksUrl);
             player.List.AddRange(tracks);
             
             var playerMessage = await ReplyAsync($"MusicBox Player");

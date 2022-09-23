@@ -22,14 +22,15 @@ namespace qbBot.Classes
         }
 
         public IUserMessage? Message { get; set; }
-        
+
         public event EventHandler<int> MessageModificationRequired;
-        
+
         public bool IsLooping { get; set; }
 
         private int _currentTrackIndex = -1;
         public List<LavalinkTrack> List { get; }
 
+        public Dictionary<string, string> Playlist {get;}
         public override Task OnTrackEndAsync(TrackEndEventArgs eventArgs)
         {
             
@@ -89,7 +90,7 @@ namespace qbBot.Classes
             _currentTrackIndex = index - 1;
             
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
-
+            
             return PlayAsync(List[_currentTrackIndex], false);
         }
 
@@ -168,6 +169,7 @@ namespace qbBot.Classes
         public override Task StopAsync(bool disconnect = false)
         {
             List.Clear();
+            Playlist.Clear();
             return base.StopAsync(disconnect);
         }
 

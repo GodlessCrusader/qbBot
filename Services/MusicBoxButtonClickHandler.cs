@@ -56,7 +56,14 @@ namespace qbBot.Services
 
             
         }
+        private async Task SelectPlaylist(ListedLavalinkPlayer player, SocketMessageComponent component)
+        {
 
+        }
+        private async Task AddPlaylist(ListedLavalinkPlayer player, SocketMessageComponent component)
+        {
+
+        }
         private async Task PlayPauseAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             if (player.State == PlayerState.Paused)
