@@ -13,6 +13,7 @@ using Lavalink4NET.Player;
 using System.Diagnostics;
 using System.Reflection;
 
+
 public class Program
 {
    // public static void Main(string[] args) => new Program().MainAsync();
@@ -41,7 +42,8 @@ public class Program
                 {
                     LogLevel = Discord.LogSeverity.Debug,
                     AlwaysDownloadUsers = true,
-                    MessageCacheSize = 200
+                    MessageCacheSize = 200,
+                    GatewayIntents = Discord.GatewayIntents.AllUnprivileged | Discord.GatewayIntents.MessageContent
                 };
 
                 config.Token = context.Configuration["Token"];

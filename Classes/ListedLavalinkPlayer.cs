@@ -31,7 +31,7 @@ namespace qbBot.Classes
 
         public bool IsLooping { get; set; }
 
-        private int _currentTrackIndex = -1;
+        private int _currentTrackIndex = 0;
         public List<LavalinkTrack> List { get; }
         public Dictionary<string, string> Playlist { get; }
         public override Task OnTrackEndAsync(TrackEndEventArgs eventArgs)

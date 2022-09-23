@@ -38,12 +38,16 @@ namespace qbBot.Services
 
         private async Task HandleMessageAsync(SocketMessage arg)
         {
-            if (!(arg is SocketUserMessage mes) || arg.Source == Discord.MessageSource.Bot) return;
-            
+            if (!(arg is SocketUserMessage mes) || arg.Source == Discord.MessageSource.Bot)
+            {
+                return;
+            }
             var argPos = 0;
-            
-            if (!mes.HasCharPrefix('!', ref argPos)) return;
 
+            if (!mes.HasStringPrefix("!", ref argPos))
+            {
+                return;
+            }
             var context = new SocketCommandContext(Client, mes);
 
             await _commandService.ExecuteAsync(context, argPos, _provider);
