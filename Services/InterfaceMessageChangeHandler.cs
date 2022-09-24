@@ -98,14 +98,16 @@ namespace qbBot.Services
                         iterationStart = counter - 1;
                         iterationEnd = iterationStart + MAX_OPTIONS_COUNT;
                     }
+
+                    if (player.List.Count - currentTrackIndex <= MAX_OPTIONS_COUNT / 2)
+                    {
+                        iterationStart = currentTrackIndex - MAX_OPTIONS_COUNT / 2;
+                        iterationEnd = player.List.Count;
+                    }
                 }
                 else
                     iterationEnd = player.List.Count;
-                if (player.List.Count - currentTrackIndex <= MAX_OPTIONS_COUNT / 2)
-                {
-                    iterationStart = currentTrackIndex - MAX_OPTIONS_COUNT / 2;
-                    iterationEnd = player.List.Count;
-                }
+                
                 
                 for (int i = iterationStart; i < iterationEnd; i++)
                 {

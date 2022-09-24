@@ -15,13 +15,14 @@ using System.Linq.Expressions;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace qbBot.Modules
 {
     public class General : ModuleBase<SocketCommandContext>
     {
         private InterfaceMessageChangeHandler _interfaceMessageChangeHandler { get; set; }
-        private IAudioService _audioService { get; set; } 
+        private IAudioService _audioService { get; set; }
         private IDiscordClientWrapper _wrapper { get; set; }
         public General(IAudioService audioService,
             IDiscordClientWrapper discordClientWrapper,
@@ -31,12 +32,45 @@ namespace qbBot.Modules
             _audioService = audioService;
             _interfaceMessageChangeHandler = interfaceMessageChangeHandler;
         }
-        
+
         [Command("ping")]
         public async Task PingAsync()
         {
             await ReplyAsync("Pong");
-          
+        }
+
+        [Command("help")]
+        [Alias("!")]
+        public async Task HelpAsync()
+        {
+            var embedBuilder = new EmbedBuilder();
+            embedBuilder
+                .WithTitle("qbBot Help.")
+                .WithAuthor("Godless Crusader")
+                .AddField("ping", "Help");
+        }
+
+        [Command("quit")]
+        [Alias("q")]
+        public async Task QuitAsync()
+        {
+            var player = _audioService.GetPlayer(Context.Guild.Id);
+            if(await PlayerInteractionCheckAsync(player))
+            {
+                
+                
+                if (player is ListedLavalinkPlayer)
+                {
+                    var listed = (ListedLavalinkPlayer)player;
+                    await listed.ExitAsync();
+                }
+                else
+                {
+                    await player.DestroyAsync();
+                }    
+        
+                player.Dispose();
+            }    
         }
 
         [Command("roll")]
@@ -70,8 +104,9 @@ namespace qbBot.Modules
 
             var player = _audioService.GetPlayer(Context.Guild.Id);
             if(player == null)
-                await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id);
+                player = await _audioService.JoinAsync<LavalinkPlayer>(Context.Guild.Id, channel.Id, true);
             await player.PlayAsync(track);
+            ReplyAsync("https://media.giphy.com/media/Vuw9m5wXviFIQ/giphy.gif");
         }
 
         [Command("goto")]
@@ -106,23 +141,32 @@ namespace qbBot.Modules
                 await ReplyAsync("Couldn't find anything");
                 return;
             }
+
+
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             
             var player = _audioService.GetPlayer<ListedLavalinkPlayer>(Context.Guild.Id);
+
+            IUserMessage playerMessage;
             
+
             if (player == null)
             {
                 player = await _audioService.JoinAsync<ListedLavalinkPlayer>(Context.Guild.Id, channel.Id, true);
                 player.MessageModificationRequired += _interfaceMessageChangeHandler.ModifyInterfaceMessageAsync;
-            }
 
-            player.List.AddRange(tracks);
-            
-            var playerMessage = await ReplyAsync($"MusicBox Player");
-            if(player.Message == null)
+                playerMessage = await ReplyAsync($"MusicBox Player");
                 player.Message = playerMessage;
-            player.AddPlaylist(playListName, tracksUrl);
-            await player.GotoAsync(1);
+                player.List.AddRange(tracks);
+                await player.GotoAsync(1);
+                await player.AddPlaylist(playListName, tracksUrl);
+            }
+            else
+            {
+                await player.AddPlaylist(playListName, tracksUrl);
+            }
+            
+
         }
 
         
@@ -130,7 +174,7 @@ namespace qbBot.Modules
         {
             if (player == null || player.State == PlayerState.Destroyed || player.State == PlayerState.NotConnected)
             {
-                await ReplyAsync("Please consider initializing player with !mb command!");
+                await ReplyAsync("Player is uninitialized. Please consider initializing player with !mb command!");
                 return false;
             }
 
