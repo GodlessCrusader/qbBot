@@ -101,6 +101,11 @@ namespace qbBot.Services
                 }
                 else
                     iterationEnd = player.List.Count;
+                if (player.List.Count - currentTrackIndex <= MAX_OPTIONS_COUNT / 2)
+                {
+                    iterationStart = currentTrackIndex - MAX_OPTIONS_COUNT / 2;
+                    iterationEnd = player.List.Count;
+                }
                 
                 for (int i = iterationStart; i < iterationEnd; i++)
                 {
@@ -108,7 +113,7 @@ namespace qbBot.Services
                         $"{counter++}. {player.List[i].Title}",
                         (i + 1).ToString());
                 }
-
+                
 
                 componentBuilder.WithSelectMenu(playlistsSelectorBuilder);
                 componentBuilder.WithSelectMenu(tracksSelectorBuilder);

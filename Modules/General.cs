@@ -98,10 +98,10 @@ namespace qbBot.Modules
 
             var playListName = "Playlist";
             
-            if (Context.Message.Embeds != null)
+            if (Context.Message.Embeds.Count != 0)
                 playListName = Context.Message.Embeds.First().Title;
                 
-            if(tracks == null)
+            if(!tracks.Any())
             {
                 await ReplyAsync("Couldn't find anything");
                 return;
