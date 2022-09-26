@@ -1,21 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Lavalink4NET;
-using Lavalink4NET.DiscordNet;
 using Lavalink4NET.Player;
-using Microsoft.Extensions.DependencyInjection;
 using qbBot.Classes;
 using qbBot.Services;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace qbBot.Modules
 {
@@ -57,8 +45,6 @@ namespace qbBot.Modules
             var player = _audioService.GetPlayer(Context.Guild.Id);
             if(await PlayerInteractionCheckAsync(player))
             {
-                
-                
                 if (player is ListedLavalinkPlayer)
                 {
                     var listed = (ListedLavalinkPlayer)player;
@@ -132,17 +118,21 @@ namespace qbBot.Modules
             var tracks = await _audioService.GetTracksAsync(tracksUrl);
 
             var playListName = "Playlist";
-            
-            if (Context.Message.Embeds.Count != 0)
-                playListName = Context.Message.Embeds.First().Title;
-                
+              
             if(!tracks.Any())
             {
                 await ReplyAsync("Couldn't find anything");
                 return;
             }
 
+            if (Context.Message.Embeds.Count != 0)
+                playListName = Context.Message.Embeds.First().Title;
+            else
+                playListName = tracks.First().Title;
 
+            if (playListName.Length >= 100)
+               playListName = playListName.Take(99).ToString();
+            
             var channel = Context.Guild.VoiceChannels.First(x => x.ConnectedUsers.Contains(Context.User));
             
             var player = _audioService.GetPlayer<ListedLavalinkPlayer>(Context.Guild.Id);
