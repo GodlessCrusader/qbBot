@@ -153,7 +153,10 @@ namespace qbBot.Modules
             }
             else
             {
-                await player.AddPlaylist(playListName, tracksUrl);
+                if (player.Playlist.Count < 24)
+                    await player.AddPlaylist(playListName, tracksUrl);
+                else
+                    await ReplyAsync("Playlist List is full.");
             }
             
 
