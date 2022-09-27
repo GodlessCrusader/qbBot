@@ -54,6 +54,11 @@ namespace qbBot.Services
                         style: ButtonStyle.Success
                     )
                     .WithButton(
+                        label: Emoji.Parse(":twisted_rightwards_arrows:").ToString(),
+                        customId: "shuffle",
+                        style: ButtonStyle.Success
+                    )
+                    .WithButton(
                         label: Emoji.Parse(":track_next:").ToString(),
                         customId: "next-track",
                         style: ButtonStyle.Success

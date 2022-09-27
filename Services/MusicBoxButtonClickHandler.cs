@@ -32,7 +32,8 @@ namespace qbBot.Services
                 new OnClickMethod("exit", ExitAsync),
                 new OnClickMethod("goto", GoToAsync),
                 new OnClickMethod("repeat", RepeatAsync),
-                new OnClickMethod("playlist", SelectPlaylistAsync)
+                new OnClickMethod("playlist", SelectPlaylistAsync),
+                new OnClickMethod("shuffle", ShuffleAsync)
             };
         }
         
@@ -133,6 +134,11 @@ namespace qbBot.Services
         private async Task PreviousTrackAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             await player.PreviousAsync();
+        }
+
+        private async Task ShuffleAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
+        {
+            await player.ShuffleAsync();
         }
     }
      

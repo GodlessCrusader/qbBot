@@ -15,9 +15,10 @@ namespace qbBot.Classes
     {
         private readonly bool _disconnectOnStop;
 
-
+        private int[] _playOrder;
         public ListedLavalinkPlayer()
         {
+            IsShuffling = false;
             Playlist = new();
             List = new();
             _disconnectOnStop = DisconnectOnStop;
@@ -29,6 +30,7 @@ namespace qbBot.Classes
 
         public event EventHandler<int> MessageModificationRequired;
 
+        public bool IsShuffling { get; set; }
         public bool IsLooping { get; set; }
 
         private int _currentTrackIndex = 0;
@@ -124,15 +126,43 @@ namespace qbBot.Classes
                         _currentTrackIndex = List.Count - 1;
                 }
 
-                MessageModificationRequired.Invoke(this, _currentTrackIndex);
+                MessageModificationRequired.Invoke(this, _playOrder[_currentTrackIndex] - 1);
                 // a track to play was found, dequeue and play
-                return PlayAsync(List[_currentTrackIndex], false);
+                return PlayAsync(List[_playOrder[_currentTrackIndex] - 1], false);
             }
             // no tracks queued, stop player and disconnect if specified
            
             return Task.CompletedTask;
         }
-    
+        
+        public async Task ShuffleAsync()
+        {
+            
+            if (!IsShuffling)
+            {
+                IsShuffling = true;
+                var rng = new Random(11);
+                _playOrder = Enumerable.Range(1, List.Count).OrderBy(x => rng.Next()).ToArray();
+                for(int i = 0; i < _playOrder.Length; i++)
+                {
+                    if (_playOrder[i] == _currentTrackIndex + 1)
+                    {
+                        _currentTrackIndex = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                IsShuffling = false;
+                _currentTrackIndex = _playOrder[_currentTrackIndex];
+                _playOrder = Enumerable.Range(1, List.Count).ToArray();
+                
+            }
+                
+               
+        }
+
         public virtual Task SkipAsync(int count = 1)
         {
             // no tracks to skip
@@ -153,7 +183,6 @@ namespace qbBot.Classes
             else if (! (List.Count == 0))
             {
 
-                
                 for (int i = 0; i < count; i++)
                 {
                     _currentTrackIndex ++;
@@ -161,9 +190,8 @@ namespace qbBot.Classes
                         _currentTrackIndex = 0;
                 }
 
-                MessageModificationRequired.Invoke(this, _currentTrackIndex);
-                // a track to play was found, dequeue and play
-                return PlayAsync(List[_currentTrackIndex], false);
+                MessageModificationRequired.Invoke(this, _playOrder[_currentTrackIndex] - 1);
+                return PlayAsync(List[ _playOrder[_currentTrackIndex] - 1], false);
             }
 
             return Task.CompletedTask;
