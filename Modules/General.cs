@@ -33,9 +33,16 @@ namespace qbBot.Modules
         {
             var embedBuilder = new EmbedBuilder();
             embedBuilder
+                .WithColor(Color.Blue)
                 .WithTitle("qbBot Help.")
                 .WithAuthor("Godless Crusader")
-                .AddField("ping", "Help");
+                .AddField("!ping", "Replies with pong")
+                .AddField("!quit / !q","Makes bot to exit voice channel")
+                .AddField("!musicbox / !mb", "Use it to play music from youtube. !mb [youtube link]")
+                .AddField("!rickroll / !rr", "〵( ͝ ° ͜ʖ͡° )〴")
+                .AddField("!roll / !r", "Use to roll dice. !r [dice expression like 3d6]")
+                .AddField("!goto", "Use to change current playing musicbox track. !goto [track number]");
+            await ReplyAsync(embed: embedBuilder.Build());
         }
 
         [Command("quit")]
