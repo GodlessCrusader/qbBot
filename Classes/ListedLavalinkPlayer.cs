@@ -211,9 +211,13 @@ namespace qbBot.Classes
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
         }
 
-        public Task AddPlaylist(string title, string url)
+        public Task AddPlaylistAsync(string title, string url, IAudioService service)
         {
             Playlist.Add(title, url);
+            if(List.Count == 0)
+            {
+                return ChangePlaylistAsync(title, service);
+            }
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
             return Task.CompletedTask;
         }
@@ -228,6 +232,7 @@ namespace qbBot.Classes
 
             List.Clear();
             List.AddRange(tracks);
+            _playOrder = Enumerable.Range(1, List.Count).ToArray();
             _currentTrackIndex = 0;
             MessageModificationRequired.Invoke(this, _currentTrackIndex);
             await GotoAsync(_currentTrackIndex + 1);

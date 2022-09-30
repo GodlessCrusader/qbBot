@@ -67,7 +67,7 @@ namespace qbBot.Services
             if (socketModal.GuildId == null)
                 return;
             var player = _audioService.GetPlayer<ListedLavalinkPlayer>((ulong)socketModal.GuildId);
-            player.AddPlaylist(title, url);
+            player.AddPlaylistAsync(title, url, _audioService);
             
             await socketModal.DeferAsync();
         }

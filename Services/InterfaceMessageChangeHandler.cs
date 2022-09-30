@@ -67,14 +67,25 @@ namespace qbBot.Services
                         customId: "exit",
                         style: ButtonStyle.Success
                     );
-
-                var replyEmbedBuilder = new EmbedBuilder();
-
-                replyEmbedBuilder
-                    .WithTitle("Music Box")
-                    .WithColor(Color.DarkOrange)
-                    .AddField($"Currently playing: {currentTrackIndex + 1}. {player.List[currentTrackIndex].Title}",
-                    player.List[currentTrackIndex].Duration);
+                EmbedBuilder replyEmbedBuilder = new EmbedBuilder();
+               
+                if (player.List.Any())
+                {
+                    
+                    replyEmbedBuilder
+                        .WithTitle("Music Box")
+                        .WithColor(Color.DarkOrange)
+                        .AddField($"Currently playing: {currentTrackIndex + 1}. {player.List[currentTrackIndex].Title}",
+                        player.List[currentTrackIndex].Duration);
+                }
+                else
+                {
+                    replyEmbedBuilder
+                        .WithTitle("0 tracks loaded")
+                        .WithColor(Color.Red)
+                        .AddField(" - ", " - ");
+                }
+                    
                     
                 var tracksSelectorBuilder = new SelectMenuBuilder();
                     tracksSelectorBuilder

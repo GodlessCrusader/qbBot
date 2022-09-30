@@ -147,14 +147,12 @@ namespace qbBot.Modules
 
                 playerMessage = await ReplyAsync($"MusicBox Player");
                 player.Message = playerMessage;
-                player.List.AddRange(tracks);
-                await player.GotoAsync(1);
-                await player.AddPlaylist(playListName, tracksUrl);
+                await player.AddPlaylistAsync(playListName, tracksUrl, _audioService);
             }
             else
             {
                 if (player.Playlist.Count < 24)
-                    await player.AddPlaylist(playListName, tracksUrl);
+                    await player.AddPlaylistAsync(playListName, tracksUrl, _audioService);
                 else
                     await ReplyAsync("Playlist List is full.");
             }
