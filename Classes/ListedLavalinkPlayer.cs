@@ -234,9 +234,19 @@ namespace qbBot.Classes
             List.AddRange(tracks);
             _playOrder = Enumerable.Range(1, List.Count).ToArray();
             _currentTrackIndex = 0;
-            MessageModificationRequired.Invoke(this, _currentTrackIndex);
             await GotoAsync(_currentTrackIndex + 1);
-            
+            if (IsShuffling)
+            {
+                for(int i = 0; i < _playOrder.Length; i++)
+                {
+                    if (_playOrder[i] == _currentTrackIndex + 1)
+                    {
+                        _currentTrackIndex = i;
+                        break;
+                    }
+                }
+            }
+            MessageModificationRequired.Invoke(this, _currentTrackIndex);
         }
     }
 }

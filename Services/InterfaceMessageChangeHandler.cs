@@ -35,7 +35,15 @@ namespace qbBot.Services
                     await player.Message.DeleteAsync();
                     return;
                 }
-
+                var playButtonStyle = ButtonStyle.Success;
+                var loopButtonStyle = ButtonStyle.Success;
+                var shuffleButtonStyle = ButtonStyle.Success;
+                if (player.State == Lavalink4NET.Player.PlayerState.Paused)
+                    playButtonStyle = ButtonStyle.Danger;
+                if(player.IsLooping)
+                    loopButtonStyle = ButtonStyle.Danger;
+                if(player.IsShuffling)
+                    shuffleButtonStyle = ButtonStyle.Danger;
                 var componentBuilder = new ComponentBuilder();
                 componentBuilder
                     .WithButton(
@@ -46,17 +54,17 @@ namespace qbBot.Services
                     .WithButton(
                         label: Emoji.Parse(":play_pause:").ToString(),
                         customId: "play-pause",
-                        style: ButtonStyle.Success
+                        style: playButtonStyle
                     )
                     .WithButton(
                         label: Emoji.Parse(":repeat:").ToString(),
                         customId: "repeat",
-                        style: ButtonStyle.Success
+                        style: loopButtonStyle
                     )
                     .WithButton(
                         label: Emoji.Parse(":twisted_rightwards_arrows:").ToString(),
                         customId: "shuffle",
-                        style: ButtonStyle.Success
+                        style: shuffleButtonStyle
                     )
                     .WithButton(
                         label: Emoji.Parse(":track_next:").ToString(),
@@ -67,6 +75,8 @@ namespace qbBot.Services
                         customId: "exit",
                         style: ButtonStyle.Success
                     );
+               
+
                 EmbedBuilder replyEmbedBuilder = new EmbedBuilder();
                
                 if (player.List.Any())

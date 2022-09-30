@@ -45,6 +45,28 @@ namespace qbBot.Modules
             await ReplyAsync(embed: embedBuilder.Build());
         }
 
+        [Command("skip")]
+        [Alias("s")]
+        public async Task SkipAsync()
+        {
+            var player = _audioService.GetPlayer(Context.Guild.Id);
+            
+            if (await PlayerInteractionCheckAsync(player))
+            {
+                if (player is ListedLavalinkPlayer)
+                {
+                    var listed = (ListedLavalinkPlayer)player;
+                    await listed.SkipAsync();
+                }
+                else
+                {
+                    await ReplyAsync("This player doesn't support queueing. Consider reinitializing with !q -> !mb");
+                }
+
+                player.Dispose();
+            }
+            
+        }
         [Command("quit")]
         [Alias("q")]
         public async Task QuitAsync()
