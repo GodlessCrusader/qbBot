@@ -4,6 +4,7 @@ using Lavalink4NET;
 using Lavalink4NET.Player;
 using qbBot.Classes;
 using qbBot.Services;
+using System.Security.Cryptography.X509Certificates;
 
 namespace qbBot.Modules
 {
@@ -27,6 +28,20 @@ namespace qbBot.Modules
             await ReplyAsync("Pong");
         }
 
+        [Command("about")]
+        public async Task AboutAsync()
+        {
+            var embedBuilder = new EmbedBuilder();
+            embedBuilder
+                .WithColor(Color.Blue)
+                .WithTitle("qbBot Information.")
+                .WithAuthor("Godless Crusader")
+                .AddField("Bio", "User friendly and powerful tabletop rpg companion bot")
+                .AddField("Basic features", "Playing music with compact gui. Rolling dice.")
+                .AddField("Source code", "https://www.github.com/godlesscrusader/qbbot-core")
+                .AddField("Contacts and bug reports", "https://www.github.com/godlesscrusader/, telegram:@godlcrus");
+            await ReplyAsync(embed: embedBuilder.Build());
+        }
         [Command("help")]
         [Alias("!")]
         public async Task HelpAsync()
