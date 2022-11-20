@@ -12,12 +12,10 @@ using Lavalink4NET.Tracking;
 using Lavalink4NET.Player;
 using System.Diagnostics;
 using System.Reflection;
-
+using Discord.Addons.Hosting.Util;
 
 public class Program
 {
-   // public static void Main(string[] args) => new Program().MainAsync();
-
     public static async Task Main()
     {
         
@@ -76,24 +74,19 @@ public class Program
 
         var host = builder.Build();
 
-        
-        var lavaProcessInfo = new ProcessStartInfo() {
-            FileName = "java",
-            Arguments = "-jar Lavalink.jar",
-            WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "lava")
-        };
-        using var lavaProcess = Process.Start(lavaProcessInfo);
-
+  
         using (host)
         {
+            
             var musicBoxComponentHandler = host.Services.GetRequiredService<MusicBoxButtonClickHandler>();
             var client = host.Services.GetRequiredService<DiscordSocketClient>();
             var audioService = host.Services.GetRequiredService<IAudioService>();
-            client.Ready += audioService.InitializeAsync;
+            client.Ready += audioService.InitializeAsync;  
             client.ButtonExecuted += musicBoxComponentHandler.HandleMusicBoxComponentAsync;
             client.SelectMenuExecuted += musicBoxComponentHandler.HandleMusicBoxComponentAsync;
             client.ModalSubmitted += musicBoxComponentHandler.HandleAddPlaylistModal;
             await host.RunAsync();
+            
         }
       
     }

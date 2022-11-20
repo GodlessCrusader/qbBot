@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qbBot", "qbBot.csproj", "{D65C3477-6A66-4638-902C-499C198F4B07}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qbBot.Tests", "..\qbBot.Tests\qbBot.Tests.csproj", "{4E50F891-3523-4522-BE17-6CC2AD0AF5A9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot", "..\DiscordBot\DiscordBot.csproj", "{1D3678CB-27FD-4AEE-88A8-2E1F93E31205}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qbBot", "qbBot.csproj", "{D65C3477-6A66-4638-902C-499C198F4B07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +15,6 @@ Global
 		{D65C3477-6A66-4638-902C-499C198F4B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D65C3477-6A66-4638-902C-499C198F4B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D65C3477-6A66-4638-902C-499C198F4B07}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E50F891-3523-4522-BE17-6CC2AD0AF5A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E50F891-3523-4522-BE17-6CC2AD0AF5A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E50F891-3523-4522-BE17-6CC2AD0AF5A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E50F891-3523-4522-BE17-6CC2AD0AF5A9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1D3678CB-27FD-4AEE-88A8-2E1F93E31205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1D3678CB-27FD-4AEE-88A8-2E1F93E31205}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1D3678CB-27FD-4AEE-88A8-2E1F93E31205}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1D3678CB-27FD-4AEE-88A8-2E1F93E31205}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

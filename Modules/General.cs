@@ -217,6 +217,7 @@ namespace qbBot.Modules
         }
         private async Task<bool> ChannelJoinInitCheckAsync()
         {
+            
             if (Context.Guild == null)
             {
                 await ReplyAsync("Please type command in guild chat");
