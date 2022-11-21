@@ -15,6 +15,7 @@ namespace qbBot.Services
     public class MusicBoxButtonClickHandler
     {
         private IAudioService _audioService { get; set; }
+        
         private IDiscordClientWrapper _wrapper { get; set; }
         
         private List<OnClickMethod> _onClickMethods { get; set; }
@@ -71,6 +72,7 @@ namespace qbBot.Services
             
             await socketModal.DeferAsync();
         }
+
         private async Task SelectPlaylistAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             if (component.Data.Values.First() == "add-playlist")
@@ -81,6 +83,7 @@ namespace qbBot.Services
 
             await player.ChangePlaylistAsync(component.Data.Values.First(), _audioService);
         }
+
         private async Task AddPlaylistAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             var formBuilder = new ModalBuilder();
@@ -92,6 +95,7 @@ namespace qbBot.Services
             await component.RespondWithModalAsync(formBuilder.Build());
             
         }
+
         private async Task PlayPauseAsync(ListedLavalinkPlayer player, SocketMessageComponent component)
         {
             if (player.State == PlayerState.Paused)

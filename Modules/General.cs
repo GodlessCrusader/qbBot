@@ -42,6 +42,7 @@ namespace qbBot.Modules
                 .AddField("Contacts and bug reports", "https://www.github.com/godlesscrusader/, telegram:@godlcrus");
             await ReplyAsync(embed: embedBuilder.Build());
         }
+
         [Command("help")]
         [Alias("!")]
         public async Task HelpAsync()
@@ -82,6 +83,7 @@ namespace qbBot.Modules
             }
             
         }
+
         [Command("quit")]
         [Alias("q")]
         public async Task QuitAsync()
@@ -204,7 +206,6 @@ namespace qbBot.Modules
 
         }
 
-        
         private async Task<bool> PlayerInteractionCheckAsync(LavalinkPlayer? player)
         {
             if (player == null || player.State == PlayerState.Destroyed || player.State == PlayerState.NotConnected)
@@ -215,6 +216,7 @@ namespace qbBot.Modules
 
             return true;
         }
+
         private async Task<bool> ChannelJoinInitCheckAsync()
         {
             

@@ -85,7 +85,7 @@ namespace qbBot.Services
                     replyEmbedBuilder
                         .WithTitle("Music Box")
                         .WithColor(Color.DarkOrange)
-                        .AddField($"Currently playing: {currentTrackIndex + 1}. {player.List[currentTrackIndex].Title}",
+                        .AddField($"Currently playing: {currentTrackIndex + 1}. {player.List[currentTrackIndex].Title.Shorten(50)}",
                         player.List[currentTrackIndex].Duration);
                 }
                 else
@@ -133,13 +133,13 @@ namespace qbBot.Services
                 }
                 else
                     iterationEnd = player.List.Count;
-                
-                
+
+
                 for (int i = iterationStart; i < iterationEnd; i++)
                 {
                     tracksSelectorBuilder.AddOption(
-                        $"{counter++}. {player.List[i].Title}",
-                        (i + 1).ToString());
+                        $"{counter++}. {player.List[i].Title.Shorten(50)}",
+                        (i + 1).ToString().Shorten(50));
                 }
                 
 
@@ -159,5 +159,7 @@ namespace qbBot.Services
 
            
         }
+
+        
     }
 }
